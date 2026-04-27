@@ -1,44 +1,44 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>CRUD App</title>
-</head>
 <body>
 
 <h2>Add / Update User</h2>
 
-<input type="text" id="name" placeholder="Enter Name"><br><br>
-<input type="email" id="email" placeholder="Enter Email"><br><br>
+<input id="name" placeholder="Name"><br><br>
+<input id="email" placeholder="Email"><br><br>
 
 <button onclick="handleSubmit()">Submit</button>
 
-<h3>Users List</h3>
-<ul id="userList"></ul>
+<h3>Users</h3>
+<ul id="list"></ul>
 
 <script>
-    const BASE_URL = "http://192.168.1.8:5000";
-    let editId = null;
+const BASE_URL = "http://192.168.1.8:5000";
+let editId = null;
 
-    // 🔥 CREATE + UPDATE
-    async function handleSubmit() {
-        const name = document.getElementById("name").value;
-        const email = document.getElementById("email").value;
+async function handleSubmit() {
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
 
-        if (!name || !email) {
-            alert("Fill all fields");
-            return;
-        }
+    if (!name || !email) {
+        alert("Enter all fields");
+        return;
+    }
 
+    try {
         if (editId) {
-            // UPDATE
+            console.log("Updating:", editId);
+
             await fetch(BASE_URL + "/updateUser/" + editId, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ name, email })
             });
+
             editId = null;
         } else {
-            // CREATE
+            console.log("Adding user");
+
             await fetch(BASE_URL + "/addUser", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -50,46 +50,52 @@
         document.getElementById("email").value = "";
 
         getUsers();
+
+    } catch (err) {
+        console.error(err);
     }
+}
 
-    // 🔥 READ
-    async function getUsers() {
-        const res = await fetch(BASE_URL + "/getUsers");
-        const data = await res.json();
+async function getUsers() {
+    const res = await fetch(BASE_URL + "/getUsers");
+    const data = await res.json();
 
-        const list = document.getElementById("userList");
-        list.innerHTML = "";
+    const list = document.getElementById("list");
+    list.innerHTML = "";
 
-        data.forEach(user => {
-            const li = document.createElement("li");
+    data.forEach(user => {
+        const li = document.createElement("li");
 
-            li.innerHTML = `
-                ${user.name} - ${user.email}
-                <button onclick="editUser('${user._id}', '${user.name}', '${user.email}')">Edit</button>
-                <button onclick="deleteUser('${user._id}')">Delete</button>
-            `;
+        li.innerHTML = `
+            ${user.name} - ${user.email}
+            <button onclick="editUser('${user._id}','${user.name}','${user.email}')">Edit</button>
+            <button onclick="deleteUser('${user._id}')">Delete</button>
+        `;
 
-            list.appendChild(li);
-        });
-    }
+        list.appendChild(li);
+    });
+}
 
-    // 🔥 DELETE
-    async function deleteUser(id) {
-        await fetch(BASE_URL + "/deleteUser/" + id, {
-            method: "DELETE"
-        });
+async function deleteUser(id) {
+    console.log("Deleting:", id);
 
-        getUsers();
-    }
-
-    // 🔥 EDIT (fill inputs)
-    function editUser(id, name, email) {
-        document.getElementById("name").value = name;
-        document.getElementById("email").value = email;
-        editId = id;
-    }
+    await fetch(BASE_URL + "/deleteUser/" + id, {
+        method: "DELETE"
+    });
 
     getUsers();
+}
+
+function editUser(id, name, email) {
+    console.log("Editing:", id);
+
+    document.getElementById("name").value = name;
+    document.getElementById("email").value = email;
+
+    editId = id;
+}
+
+getUsers();
 </script>
 
 </body>
