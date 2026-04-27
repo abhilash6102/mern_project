@@ -17,7 +17,7 @@
             const name = document.getElementById("name").value;
             const email = document.getElementById("email").value;
 
-            const response = await fetch("http://localhost:5000/addUser", {
+            const response = await fetch("http://192.168.1.8:5000/addUser", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -35,7 +35,7 @@
 
 <script>
     async function getUsers() {
-        const res = await fetch("http://localhost:5000/getUsers");
+        const res = await fetch("http://192.168.1.8:5000/getUsers");
         const data = await res.json();
 
         const list = document.getElementById("userList");
