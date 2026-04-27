@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API</title>
+</head>
+<body>
+
+    <h2>Add User</h2>
+
+    <input type="text" id="name" placeholder="Enter Name"><br><br>
+    <input type="email" id="email" placeholder="Enter Email"><br><br>
+
+    <button onclick="sendData()">Submit</button>
+
+    <script>
+        async function sendData() {
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+
+            const response = await fetch("http://localhost:5000/addUser", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ name, email })
+            });
+
+            const data = await response.text();
+            alert(data);
+        }
+    </script>
+
+<h3>Users List</h3>
+<ul id="userList"></ul>
+
+<script>
+    async function getUsers() {
+        const res = await fetch("http://localhost:5000/getUsers");
+        const data = await res.json();
+
+        const list = document.getElementById("userList");
+        list.innerHTML = "";
+
+        data.forEach(user => {
+            const li = document.createElement("li");
+            li.textContent = user.name + " - " + user.email;
+            list.appendChild(li);
+        });
+    }
+
+    // Call this when page loads
+    getUsers();
+</script>
+</body>
+</html>
